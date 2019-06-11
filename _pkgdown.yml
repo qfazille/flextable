@@ -4,14 +4,23 @@ template:
   package: ardown
   bootswatch: simplex
 
+home:
+  links:
+  - text: 'Visit <a href="https://www.ardata.fr"><img alt="ardata" src="https://www.ardata.fr/img/ardata-logo.svg" width="70"></a> website'
+    href: https://www.ardata.fr
+
 reference:
   - title: Create flextable
     contents:
     - flextable
-    - xtable_to_flextable
-  - title: Headers
+    - qflextable
+  - title: Headers and footers
     desc:  Add or modify flextable`s headers or footers
     contents:
+    - add_header_row
+    - add_footer_row
+    - add_header_lines
+    - add_footer_lines
     - add_header
     - add_footer
     - set_header_labels
@@ -26,8 +35,10 @@ reference:
     - autofit
     - dim.flextable
     - dim_pretty
+    - flextable_dim
     - as_grouped_data
     - xtable_to_flextable
+    - as_flextable
   - title: Format flextable
     desc:  Modify flextable`s formatting properties.
     contents:
@@ -49,6 +60,7 @@ reference:
     - starts_with("hline")
     - starts_with("vline")
     - starts_with("border")
+    - fix_border_issues
   - title: Flextable themes
     desc:  Apply theme functions.
     contents:
@@ -66,6 +78,7 @@ reference:
     - linerange
     - hyperlink_text
     - set_caption
+    - footnote
     - void
   - title: Output functions
     contents:
@@ -73,6 +86,12 @@ reference:
     - knit_print.flextable
     - body_add_flextable
     - ph_with_flextable
+    - plot.flextable
+    - save_as_image
+    - save_as_html
+    - format.flextable
+    - htmltools_value
+    - as_raster
 
 navbar:
   title: flextable
@@ -80,12 +99,16 @@ navbar:
   left:
   - text: Overview
     href: articles/overview.html
+  - text: Selectors
+    href: articles/selectors.html
   - text: Layout
     href: articles/layout.html
-  - text: Format
+  - text: Format visual properties
     href: articles/format.html
-  - text: Display value
+  - text: Format Content
     href: articles/display.html
+  - text: Render as image
+    href: articles/offcran/images.html
   - text: Examples
     href: articles/offcran/examples.html
   right:

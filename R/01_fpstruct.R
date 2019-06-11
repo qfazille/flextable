@@ -96,6 +96,17 @@ as.data.frame.text_struct <- function(object, ...){
   data$col_id <- factor(data$col_id, levels = object$color$keys)
   data
 }
+as_fp_text_list <- function(x, i, j){
+  props_split <- mapply(function(z, colname, i, j){
+    out <- as.vector(z$data[i, z$keys[j] , drop = FALSE])
+    as.list(out)
+  }, x, names(x), MoreArgs = list( i = i, j = j ), SIMPLIFY = FALSE)
+  props_split$FUN <- fp_text
+  props_split$SIMPLIFY <- FALSE
+  props_split$USE.NAMES <- TRUE
+  do.call(mapply, props_split)
+}
+
 
 
 # par_struct -----
@@ -368,7 +379,7 @@ add_cellstyle_column <- function(x, type = "html"){
 
   if( type %in% "html"){
     background.color <- ifelse( colalpha(x$background.color) > 0,
-                       sprintf("background-color:%s;", colcodecss(x$background.color) ),
+                       sprintf("background-clip: padding-box;background-color:%s;", colcodecss(x$background.color) ),
                        "background-color:transparent;")
 
     width <- ifelse( is.na(x$width), "", sprintf("width:%s;", css_px(x$width * 72) ) )
@@ -543,7 +554,11 @@ chunkset_struct <- function( nrow, keys ){
 add_rows.chunkset_struct <- function(x, nrows, first, data, ...){
   old_nrow <- x$content$nrow
   x$content <- add_rows(x$content, nrows, first = first, default = as_paragraph(as_chunk("")) )
-  id <- ifelse(first, seq_len(nrows), rev(rev(seq_len(x$content$nrow) )[seq_len(nrows)] ) )
+  if(first){
+    id <- seq_len(nrows)
+  } else {
+    id <- rev(rev(seq_len(x$content$nrow) )[seq_len(nrows)] )
+  }
 
   newcontent <- lapply(data[x$content$keys], function(x) as_paragraph(as_chunk(x, formater = format_fun)) )
   x$content[id,x$content$keys] <- Reduce(append, newcontent)
@@ -571,6 +586,29 @@ print.chunkset_struct <- function(x, ...){
 }
 
 
+
+replace_missing_fptext_by_default <- function(x, default){
+  by_columns <- c("font.size", "italic", "bold", "underlined", "color", "shading.color", "font.family", "vertical.align")
+
+  keys <- default[, setdiff(names(default), by_columns), drop = FALSE]
+  values <- default[, by_columns, drop = FALSE]
+  names(values) <- paste0(by_columns, "_default")
+  defdata <- cbind(keys, values)
+
+  newx <- x
+  setDT(newx)
+  setDT(defdata)
+  newx <- newx[defdata, on=names(keys)]
+  setDF(newx)
+  for( j in by_columns){
+    newx[[j]] <- ifelse(is.na(newx[[j]]), newx[[paste0(j, "_default")]], newx[[j]])
+    newx[[paste0(j, "_default")]] <- NULL
+  }
+  newx
+
+}
+
+
 fortify_content <- function(x, default_chunk_fmt, ...){
 
   row_id <- unlist( mapply( function(rows, data){
@@ -590,22 +628,8 @@ fortify_content <- function(x, default_chunk_fmt, ...){
   out$col_id <- col_id
   setDF(out)
 
-  by_columns <- c("font.size", "italic", "bold", "underlined", "color", "shading.color", "font.family", "vertical.align")
-  default_props <- as.data.frame(default_chunk_fmt)
-
-  use_default_index <- Reduce(function(x,y) x & y, lapply(out[by_columns], function(x) {
-    is.na(x)
-  }) )
-
-  data0 <- out[!use_default_index,]
-  data1 <- out[use_default_index, !is.element(names(out), by_columns)]
-
-  setDT(data1)
-  data_ <- merge(data1, default_props, by = c("row_id", "col_id"), all.x = TRUE)
-  setDF(data_)
-
-  data_ <- data_[, names(data0)]
-  out <- rbind.match.columns(list(data0, data_))
+  default_props <- as.data.frame(default_chunk_fmt, stringsAsFactors = FALSE)
+  out <- replace_missing_fptext_by_default(out, default_props)
 
   out$col_id <- factor( out$col_id, levels = default_chunk_fmt$color$keys )
   out <- out[order(out$col_id, out$row_id, out$seq_index) ,]

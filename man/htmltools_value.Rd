@@ -2,12 +2,15 @@
 % Please edit documentation in R/printers.R
 \name{htmltools_value}
 \alias{htmltools_value}
-\title{flextable a tag object from htmltools package}
+\title{flextable as a div object}
 \usage{
-htmltools_value(x)
+htmltools_value(x, class = "tabwid")
 }
 \arguments{
 \item{x}{a flextable object}
+
+\item{class}{css classes (default to "tabwid"), accepted values
+are "tabwid", "tabwid tabwid_left", "tabwid tabwid_right".}
 }
 \description{
 get a \code{\link[htmltools]{div}} from a flextable object.
@@ -17,8 +20,11 @@ This can be used in a shiny application.
 htmltools_value(flextable(iris[1:5,]))
 }
 \seealso{
-Other flextable print function: \code{\link{format.flextable}},
+Other flextable print function: \code{\link{as_raster}},
+  \code{\link{docx_value}}, \code{\link{format.flextable}},
   \code{\link{knit_print.flextable}},
-  \code{\link{print.flextable}}, \code{\link{save_as_html}}
+  \code{\link{plot.flextable}},
+  \code{\link{print.flextable}},
+  \code{\link{save_as_html}}, \code{\link{save_as_image}}
 }
 \concept{flextable print function}

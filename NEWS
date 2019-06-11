@@ -1,3 +1,23 @@
+# flextable 0.5.5
+
+## new features
+
+* new function `docx_value` to let display flextables from non top level
+ calls inside R Markdown document.
+
+## Issues
+
+* fix issue with `save_as_image` with R for Windows
+
+# flextable 0.5.3
+
+## new features
+
+* new functions to render flextable in plot (see `plot`), as an image (see `save_as_image`)
+  and raster for ggplot2 (see `as_raster`).
+* new function `footnote` to ease footnotes management
+* colformat functions are suporting i argument now for rows selection.
+
 # flextable 0.5.2
 
 ## new features
